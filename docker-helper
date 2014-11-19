@@ -7,9 +7,10 @@ usage() {
     echo "remove domain.com"
     echo "start domain.com"
     echo "stop domain.com"
-    echo "upgrade domain.com - run 'bootstrap server' first to build new images"
-    echo "bootstrap server"
-    echo "cleanup server"
+	echo "ssh domain.com"
+    echo "upgrade domain.com - upgrades a container"
+    echo "bootstrap server - upgrades host and builds new images"
+    echo "cleanup server - removes unused images"
     printf "\n"
 }
 
@@ -53,6 +54,10 @@ case "$COMMAND" in
   stop)
     docker stop $DOMAIN
     ;;
+  ssh)
+    IP=`docker inspect -f "{{ .NetworkSettings.IPAddress }}" $DOMAIN`
+	ssh www@$IP
+    ;;
   upgrade)
     echo -e "...stopping container..."
     docker stop $DOMAIN
@@ -67,9 +72,9 @@ case "$COMMAND" in
     waiting_for_services $DOMAIN
     ;;
   bootstrap)
-    sudo sh -c "apt-get update && apt-get -y upgrade"
     sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
     sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+    sudo sh -c "apt-get update && apt-get -y upgrade"
     sudo sh -c "apt-get install -y lxc-docker git fail2ban"
     sudo sh -c "sed -i -e 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw"
     sudo sh -c "ufw allow 22 && ufw allow 80 && ufw --force enable"
@@ -80,11 +85,10 @@ case "$COMMAND" in
     sudo sh -c "docker build --no-cache -t='nginx-proxy' /srv/nginx-proxy"
     sudo sh -c "docker build --no-cache -t='docker-wordpress-nginx' /srv/docker-wordpress-nginx"
     sudo sh -c "docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock nginx-proxy"
-    echo "...you can now add sites using 'docker-helper create domain.com'..."
+    echo "...you can now add sites using './docker-helper create domain.com'..."
     ;;
   cleanup)
     docker images -q |xargs docker rmi
-    docker ps -q |xargs docker rm
     echo "...cleanup done..."
     ;;
   *)
