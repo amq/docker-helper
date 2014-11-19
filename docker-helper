@@ -7,7 +7,7 @@ usage() {
     echo "remove domain.com"
     echo "start domain.com"
     echo "stop domain.com"
-	echo "ssh domain.com"
+    echo "ssh domain.com"
     echo "upgrade domain.com - upgrades a container"
     echo "bootstrap server - upgrades host and builds new images"
     echo "cleanup server - removes unused images"
@@ -56,7 +56,7 @@ case "$COMMAND" in
     ;;
   ssh)
     IP=`docker inspect -f "{{ .NetworkSettings.IPAddress }}" $DOMAIN`
-	ssh www@$IP
+    ssh www@$IP
     ;;
   upgrade)
     echo -e "...stopping container..."
