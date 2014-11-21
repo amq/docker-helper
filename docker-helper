@@ -67,6 +67,10 @@ case "$COMMAND" in
     ssh www@$IP
     ;;
   upgrade)
+    EXISTS=`docker inspect -f "{{ .Image }}" $DOMAIN`
+    if [ -z "$EXISTS" ]; then
+        exit 1
+    fi
     echo -e "...stopping container..."
     docker stop $DOMAIN
     echo -e "...copying data..."
