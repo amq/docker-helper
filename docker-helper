@@ -39,6 +39,14 @@ fi
 COMMAND=$1
 DOMAIN=$2
 
+case "$DOMAIN" in
+  proxy)
+    docker rm -f proxy
+    docker run -d -p 80:80 --name proxy -v /var/run/docker.sock:/tmp/docker.sock nginx-proxy
+    exit 1
+    ;;
+esac
+
 case "$COMMAND" in
   create)
     docker run -p 80 -e VIRTUAL_HOST=$DOMAIN --name $DOMAIN -d docker-wordpress-nginx
