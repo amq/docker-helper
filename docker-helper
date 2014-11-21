@@ -80,6 +80,8 @@ case "$COMMAND" in
     sudo sh -c "ufw allow 22 && ufw allow 80 && ufw --force enable"
     sudo sh -c "cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local && /etc/init/fail2ban restart"
     sudo sh -c "mkdir /srv"
+    sudo sh -c "rm -rf /srv/docker-wordpress-nginx"
+    sudo sh -c "rm -rf /srv/nginx-proxy"
     sudo sh -c "git clone https://github.com/amq/docker-wordpress-nginx.git /srv/docker-wordpress-nginx"
     sudo sh -c "git clone https://github.com/amq/nginx-proxy.git /srv/nginx-proxy"
     sudo sh -c "docker build --no-cache -t='nginx-proxy' /srv/nginx-proxy"
