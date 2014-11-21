@@ -49,7 +49,7 @@ esac
 
 case "$COMMAND" in
   create)
-    docker run -p 80 -e VIRTUAL_HOST=$DOMAIN --name $DOMAIN -d docker-wordpress-nginx
+    docker run -p 80 -e VIRTUAL_HOST=$DOMAIN --name $DOMAIN --restart always -d docker-wordpress-nginx
     waiting_for_services $DOMAIN
     ;;
   remove)
@@ -74,7 +74,7 @@ case "$COMMAND" in
     echo -e "...removing old container..."
     docker rm -f $DOMAIN
     echo -e "...starting new container..."
-    docker run -p 80 -e VIRTUAL_HOST=$DOMAIN --volumes-from temp-for-upgrade --name $DOMAIN -d docker-wordpress-nginx
+    docker run -p 80 -e VIRTUAL_HOST=$DOMAIN --volumes-from temp-for-upgrade --name $DOMAIN --restart always -d docker-wordpress-nginx
     echo -e "...removing temporary container..."
     docker rm -f temp-for-upgrade
     waiting_for_services $DOMAIN
@@ -94,7 +94,7 @@ case "$COMMAND" in
     sudo sh -c "git clone https://github.com/amq/nginx-proxy.git /srv/nginx-proxy"
     sudo sh -c "docker build --no-cache -t='docker-wordpress-nginx' /srv/docker-wordpress-nginx"
     sudo sh -c "docker build --no-cache -t='nginx-proxy' /srv/nginx-proxy"
-    sudo sh -c "docker run -d -p 80:80 --name proxy -v /var/run/docker.sock:/tmp/docker.sock nginx-proxy"
+    sudo sh -c "docker run -d -p 80:80 --name proxy --restart always -v /var/run/docker.sock:/tmp/docker.sock nginx-proxy"
     echo "...you can now add sites using './docker-helper create domain.com'..."
     ;;
   cleanup)
